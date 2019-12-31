@@ -273,7 +273,7 @@ public class StreamTransferManager {
      * The first call to this method initiates the multipart upload.
      * All setter methods must be called before this.
      */
-    public List<MultiPartOutputStream> getMultiPartOutputStreams() {
+    public List<MultiPartOutputStream> getMultiPartOutputStreams(String filename) {
         if (multiPartOutputStreams != null) {
             return multiPartOutputStreams;
         }
@@ -281,7 +281,7 @@ public class StreamTransferManager {
         queue = new ArrayBlockingQueue<StreamPart>(queueCapacity);
         log.debug("Initiating multipart upload to {}/{}", bucketName, putKey);
         InitiateMultipartUploadRequest initRequest = new InitiateMultipartUploadRequest(bucketName, putKey);
-        customiseInitiateRequest(initRequest);
+        customiseInitiateRequest(initRequest, filename);
         InitiateMultipartUploadResult initResponse = s3Client.initiateMultipartUpload(initRequest);
         uploadId = initResponse.getUploadId();
         log.info("Initiated multipart upload to {}/{} with full ID {}", bucketName, putKey, uploadId);
@@ -484,11 +484,13 @@ public class StreamTransferManager {
                 bucketName, putKey, Utils.skipMiddle(uploadId, 21));
     }
 
+    public void customiseInitiateRequest(InitiateMultipartUploadRequest request, String filename) {
+    	request.setObjectMetadata(new ObjectMetadata());
+    	request.getObjectMetadata().setContentDisposition(filename);
+    }
+    
     // These methods are intended to be overridden for more specific interactions with the AWS API.
 
-    @SuppressWarnings("unused")
-    public void customiseInitiateRequest(InitiateMultipartUploadRequest request) {
-    }
 
     @SuppressWarnings("unused")
     public void customiseUploadPartRequest(UploadPartRequest request) {

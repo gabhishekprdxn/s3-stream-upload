@@ -178,7 +178,7 @@ public class StreamTransferManagerTest {
                 .queueCapacity(2)
                 .partSize(10);
 
-        final List<MultiPartOutputStream> streams = manager.getMultiPartOutputStreams();
+        final List<MultiPartOutputStream> streams = manager.getMultiPartOutputStreams("");
         List<StringBuilder> builders = new ArrayList<StringBuilder>(numStreams);
         ExecutorService pool = Executors.newFixedThreadPool(numStreams);
         for (int i = 0; i < numStreams; i++) {
